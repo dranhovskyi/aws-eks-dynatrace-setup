@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-app
+  labels:
+    # Matches the namespaceSelector in dynatrace/dynakube.yaml so this
+    # namespace's pods get the Dynatrace OneAgent code module injected.
+    inject-dynatrace: "true"

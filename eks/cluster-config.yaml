@@ -1,0 +1,42 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: todo-cluster
+  region: us-east-1
+  version: "1.30"
+
+# Enables IAM Roles for Service Accounts (needed by the EBS CSI driver,
+# Cluster Autoscaler, Dynatrace, etc.)
+iam:
+  withOIDC: true
+
+managedNodeGroups:
+  - name: todo-workers
+    instanceType: t3.medium
+    amiFamily: AmazonLinux2
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    volumeSize: 20
+    privateNetworking: false
+    ssh:
+      allow: false
+    labels:
+      role: worker
+    tags:
+      nodegroup-role: worker
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+        cloudWatch: true
+
+addons:
+  - name: vpc-cni
+  - name: coredns
+  - name: kube-proxy
+  - name: aws-ebs-csi-driver
+    wellKnownPolicies:
+      ebsCSIController: true
+  - name: metrics-server

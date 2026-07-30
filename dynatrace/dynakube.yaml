@@ -1,0 +1,24 @@
+apiVersion: dynatrace.com/v1beta5
+kind: DynaKube
+metadata:
+  name: dynakube
+  namespace: dynatrace
+spec:
+  # Include the /api path. For Dynatrace Managed use your own domain instead.
+  apiUrl: https://<YOUR_ENVIRONMENT_ID>.live.dynatrace.com/api
+
+  # Cloud-native full-stack: OneAgent on every node (infra + host metrics)
+  # PLUS automatic code-module injection into your pods (distributed tracing,
+  # service-level metrics) for namespaces matched by namespaceSelector below.
+  # Remove namespaceSelector entirely to monitor every namespace in the cluster.
+  oneAgent:
+    cloudNativeFullStack:
+      namespaceSelector:
+        matchLabels:
+          inject-dynatrace: "true"
+
+  activeGate:
+    capabilities:
+      - routing
+      - kubernetes-monitoring
+      - dynatrace-api
