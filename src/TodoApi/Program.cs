@@ -11,11 +11,8 @@ builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(8080));
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Liveness/readiness probe target for the Kubernetes Deployment.
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
