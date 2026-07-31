@@ -19,16 +19,16 @@ spec:
         - name: todo-api
           # Replace with your ECR image URI, e.g.:
           # 123456789012.dkr.ecr.us-east-1.amazonaws.com/todo-api:latest
-          image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/todo-api:latest
+          image: 303585996953.dkr.ecr.us-east-1.amazonaws.com/prod/todo-api:latest
           ports:
             - containerPort: 8080
           resources:
             requests:
               cpu: "100m"
-              memory: "128Mi"
+              memory: "256Mi"
             limits:
               cpu: "500m"
-              memory: "256Mi"
+              memory: "512Mi"
           readinessProbe:
             httpGet:
               path: /health

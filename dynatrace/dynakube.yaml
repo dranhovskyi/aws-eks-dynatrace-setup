@@ -5,7 +5,7 @@ metadata:
   namespace: dynatrace
 spec:
   # Include the /api path. For Dynatrace Managed use your own domain instead.
-  apiUrl: https://<YOUR_ENVIRONMENT_ID>.live.dynatrace.com/api
+  apiUrl: https://qcx96710.live.dynatrace.com/api
 
   # Cloud-native full-stack: OneAgent on every node (infra + host metrics)
   # PLUS automatic code-module injection into your pods (distributed tracing,
@@ -22,3 +22,10 @@ spec:
       - routing
       - kubernetes-monitoring
       - dynatrace-api
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1.5Gi

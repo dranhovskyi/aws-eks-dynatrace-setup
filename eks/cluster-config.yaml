@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: todo-cluster
   region: us-east-1
-  version: "1.30"
+  version: "1.33"
 
 # Enables IAM Roles for Service Accounts (needed by the EBS CSI driver,
 # Cluster Autoscaler, Dynatrace, etc.)
@@ -14,7 +14,7 @@ iam:
 managedNodeGroups:
   - name: todo-workers
     instanceType: t3.medium
-    amiFamily: AmazonLinux2
+    amiFamily: AmazonLinux2023
     desiredCapacity: 2
     minSize: 2
     maxSize: 4
