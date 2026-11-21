@@ -48,4 +48,4 @@ These values are coupled across files; changing one side silently breaks the oth
 
 ## Environment-specific values
 
-`k8s/deployment.yaml` (ECR image URI, currently under `prod/todo-api`) and `dynatrace/dynakube.yaml` (`apiUrl` tenant) contain real account/tenant values rather than the `<AWS_ACCOUNT_ID>` / `<YOUR_ENVIRONMENT_ID>` placeholders the README describes. The README's ECR commands use repository name `todo-api`, which does not match the `prod/todo-api` path in the deployment.
+`k8s/deployment.yaml` (ECR image URI) and `dynatrace/dynakube.yaml` (`apiUrl` tenant) contain real account/tenant values, not placeholders. The ECR repository is named `prod/todo-api`; the README's create/tag/push/delete commands and the deployment image must all use that name.

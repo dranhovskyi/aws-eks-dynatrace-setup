@@ -5,7 +5,7 @@ Amazon ECR → Amazon EKS cluster running on EC2 worker nodes → Dynatrace
 full-stack observability.
 
 ```
-todo-eks-dynatrace/
+aws-eks-dynatrace-setup/
 ├── src/TodoApi/          # .NET 8 minimal API (Todo CRUD)
 ├── k8s/                  # Kubernetes manifests
 ├── eks/                  # eksctl cluster config (EKS on EC2)
@@ -40,7 +40,7 @@ before starting.
 ### 1.1 Initialize the repo
 
 ```bash
-mkdir todo-eks-dynatrace && cd todo-eks-dynatrace
+mkdir aws-eks-dynatrace-setup && cd aws-eks-dynatrace-setup
 git init
 ```
 
@@ -67,8 +67,8 @@ dotnet run
 ```
 
 The API listens on `http://localhost:8080` (see `ListenAnyIP(8080)` in
-`Program.cs`). In development mode, Swagger UI is at
-`http://localhost:8080/swagger`.
+`Program.cs`). Swagger UI is at
+`http://localhost:8080/swagger` (enabled in every environment, including the cluster).
 
 Test it:
 
@@ -117,7 +117,7 @@ export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output tex
 export AWS_REGION=us-east-1     # match eks/cluster-config.yaml
 
 # Create the repository (one-time)
-aws ecr create-repository --repository-name todo-api --region $AWS_REGION
+aws ecr create-repository --repository-name prod/todo-api --region $AWS_REGION
 
 # Authenticate Docker to ECR
 aws ecr get-login-password --region $AWS_REGION \
@@ -125,12 +125,12 @@ aws ecr get-login-password --region $AWS_REGION \
     $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 # Tag and push
-docker tag todo-api:local $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/todo-api:latest
-docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/todo-api:latest
+docker tag todo-api:local $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/prod/todo-api:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/prod/todo-api:latest
 ```
 
 **AWS Console equivalent:** ECR → *Repositories* → *Create repository*
-(name `todo-api`) → open it → *View push commands* gives you the exact
+(name `prod/todo-api`) → open it → *View push commands* gives you the exact
 login/tag/push commands above.
 
 ---
@@ -169,8 +169,8 @@ eksctl provisioned is visible and editable there.
 
 ## Part 5 — Deploy the Todo API to the cluster
 
-Update `k8s/deployment.yaml` with your actual ECR image URI (replace the
-`<AWS_ACCOUNT_ID>`/`<AWS_REGION>` placeholders), then:
+Set the `image` in `k8s/deployment.yaml` to your ECR image URI
+(`<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/prod/todo-api:latest`), then:
 
 ```bash
 kubectl apply -f k8s/namespace.yaml
@@ -230,8 +230,8 @@ kubectl -n dynatrace create secret generic dynakube \
 
 ### 6.4 Apply the DynaKube custom resource
 
-Edit `dynatrace/dynakube.yaml` and replace `<YOUR_ENVIRONMENT_ID>` with your
-real environment ID, then:
+Edit `dynatrace/dynakube.yaml` and set `apiUrl` to your tenant's API URL
+(`https://<YOUR_ENVIRONMENT_ID>.live.dynatrace.com/api`), then:
 
 ```bash
 kubectl apply -f dynatrace/dynakube.yaml
@@ -269,7 +269,7 @@ kubectl delete -f k8s/hpa.yaml -f k8s/service.yaml -f k8s/deployment.yaml -f k8s
 kubectl delete -f dynatrace/dynakube.yaml
 helm uninstall dynatrace-operator -n dynatrace
 eksctl delete cluster -f eks/cluster-config.yaml
-aws ecr delete-repository --repository-name todo-api --region $AWS_REGION --force
+aws ecr delete-repository --repository-name prod/todo-api --region $AWS_REGION --force
 ```
 
 `eksctl delete cluster` tears down the EC2 node group, control plane, and
